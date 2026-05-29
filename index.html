@@ -1,0 +1,541 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中国語音声問題</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #050505;
+      color: #f4f4f4;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(560px, calc(100% - 24px));
+      padding: 24px 0;
+    }
+
+    .card {
+      padding: 22px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 0;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: 1.5rem;
+      line-height: 1.25;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 130px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid #444;
+      border-radius: 0;
+      background: #050505;
+      color: #f4f4f4;
+      font: 0.95rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    }
+
+    textarea:focus,
+    button:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+
+    .load-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin: 10px 0 16px;
+      align-items: center;
+    }
+
+    .format {
+      margin: 0;
+      color: #aaa;
+      font-size: 0.82rem;
+      text-align: left;
+    }
+
+    button {
+      min-height: 44px;
+      padding: 10px 14px;
+      border: 1px solid #555;
+      border-radius: 0;
+      background: #f4f4f4;
+      color: #050505;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #dcdcdc;
+    }
+
+    button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    button.sub {
+      background: #191919;
+      color: #f4f4f4;
+      border-color: #444;
+    }
+
+    button.sub:hover {
+      background: #2a2a2a;
+    }
+
+    .counter {
+      margin: 0 0 12px;
+      color: #aaa;
+      font-weight: 700;
+    }
+
+    .question {
+      min-height: 210px;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      border: 1px solid #333;
+      border-radius: 0;
+      background: #050505;
+    }
+
+    .hint {
+      margin: 0;
+      color: #aaa;
+      font-size: 1rem;
+    }
+
+    .mark {
+      color: #aaa;
+      font-size: 4rem;
+      font-weight: 900;
+    }
+
+    .hanzi {
+      margin: 0 0 10px;
+      font-size: clamp(3.5rem, 16vw, 6rem);
+      font-weight: 900;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .pinyin {
+      margin: 0 0 6px;
+      color: #69a7ff;
+      font-size: 1.45rem;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .meaning {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .buttons,
+    .small-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .message {
+      min-height: 1.5em;
+      margin: 12px 0 0;
+      color: #ff7a7a;
+      font-weight: 700;
+    }
+
+    .message.info {
+      color: #aaa;
+    }
+
+    .icon {
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      vertical-align: middle;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        padding: 16px;
+      }
+
+      .load-row,
+      .buttons,
+      .small-buttons {
+        grid-template-columns: 1fr;
+      }
+
+      .question {
+        min-height: 190px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <h1>中国語音声問題</h1>
+
+      <textarea id="problemText" spellcheck="false">低_di1_低い
+便宜_pian2 yi5_安い
+冷_leng3_寒い
+坏_huai4_悪い
+多_duo1_多い
+大_da4_大きい
+好_hao3_良い
+容易_rong2 yi4_容易だ
+小_xiao3_小さい
+少_shao3_少ない
+快_kuai4_速い
+慢_man4_遅い
+新_xin1_新しい
+旧_jiu4_古い
+早_zao3_早い
+晚_wan3_遅い時間
+热_re4_暑い
+瘦_shou4_痩せている
+短_duan3_短い
+矮_ai3_背が低い
+胖_pang4_太っている
+贵_gui4_値段が高い
+轻_qing1_軽い
+近_jin4_近い
+远_yuan3_遠い
+重_zhong4_重い
+长_chang2_長い
+难_nan2_難しい
+高_gao1_高い</textarea>
+
+      <div class="load-row">
+        <p class="format">1行1問: 簡体字_pinyin_意味</p>
+        <button id="loadButton" type="button">読み込み</button>
+      </div>
+
+      <p id="counter" class="counter">0 / 0</p>
+
+      <div id="question" class="question">
+        <p class="hint">問題テキストを読み込んでください</p>
+      </div>
+
+      <div class="buttons">
+        <button id="speakButton" type="button" aria-label="発音" title="発音" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4,10 H8 L13,5 V19 L8,14 H4 Z"></path>
+            <path d="M17,8 C19,10 19,14 17,16"></path>
+            <path d="M20,5 C23,9 23,15 20,19"></path>
+          </svg>
+        </button>
+        <button id="answerButton" type="button" aria-label="答えを見る" title="答えを見る" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2,12 C5,7 9,5 12,5 C15,5 19,7 22,12 C19,17 15,19 12,19 C9,19 5,17 2,12 Z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
+        <button id="nextButton" type="button" aria-label="次へ" title="次へ" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4,12 H19"></path>
+            <path d="M13,6 L19,12 L13,18"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="small-buttons">
+        <button id="shuffleButton" class="sub" type="button" aria-label="シャッフル" title="シャッフル" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3,7 H7 L17,17 H21"></path>
+            <path d="M17,13 L21,17 L17,21"></path>
+            <path d="M3,17 H7 L10,14"></path>
+            <path d="M17,3 L21,7 L17,11"></path>
+            <path d="M14,10 L17,7 H21"></path>
+          </svg>
+        </button>
+        <button id="restartButton" class="sub" type="button" aria-label="最初から" title="最初から" disabled>
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5,8 H11"></path>
+            <path d="M5,8 L9,4"></path>
+            <path d="M5,8 L9,12"></path>
+            <path d="M7,16 C9,20 15,21 19,17 C23,13 21,6 15,5"></path>
+          </svg>
+        </button>
+        <button id="clearButton" class="sub" type="button" aria-label="入力欄を空にする" title="入力欄を空にする">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5,5 L19,19"></path>
+            <path d="M19,5 L5,19"></path>
+          </svg>
+        </button>
+      </div>
+
+      <p id="message" class="message info">Space: 発音 / Enter: 答え / →: 次へ</p>
+    </section>
+  </main>
+
+  <script>
+    const problemText = document.getElementById("problemText");
+    const loadButton = document.getElementById("loadButton");
+    const counter = document.getElementById("counter");
+    const question = document.getElementById("question");
+    const speakButton = document.getElementById("speakButton");
+    const answerButton = document.getElementById("answerButton");
+    const nextButton = document.getElementById("nextButton");
+    const shuffleButton = document.getElementById("shuffleButton");
+    const restartButton = document.getElementById("restartButton");
+    const clearButton = document.getElementById("clearButton");
+    const message = document.getElementById("message");
+
+    let quizItems = [];
+    let currentIndex = 0;
+    let answerVisible = false;
+
+    loadButton.addEventListener("click", loadProblems);
+    speakButton.addEventListener("click", speakCurrentWord);
+    answerButton.addEventListener("click", showAnswer);
+    nextButton.addEventListener("click", nextQuestion);
+    shuffleButton.addEventListener("click", shuffleQuiz);
+    restartButton.addEventListener("click", restartQuiz);
+    clearButton.addEventListener("click", clearText);
+    document.addEventListener("keydown", handleKeys);
+    window.addEventListener("load", loadProblems);
+
+    function loadProblems() {
+      const parsed = parseProblemText(problemText.value);
+      quizItems = parsed.items;
+      currentIndex = 0;
+      answerVisible = false;
+
+      if (quizItems.length === 0) {
+        resetView("使える問題がありません");
+        setMessage("例: 你好_ni3 hao3_こんにちは", true);
+        return;
+      }
+
+      renderQuestion();
+
+      if (parsed.failedCount > 0) {
+        setMessage(`${quizItems.length}問読み込みました。解析失敗: ${parsed.failedCount}行`, false);
+      } else {
+        setMessage(`${quizItems.length}問読み込みました。`, false);
+      }
+    }
+
+    function parseProblemText(text) {
+      const lines = text.split(/\r?\n/);
+      const items = [];
+      let failedCount = 0;
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) return;
+
+        const parsed = parseLine(trimmed);
+        if (parsed) {
+          items.push(parsed);
+        } else {
+          failedCount += 1;
+        }
+      });
+
+      return { items, failedCount };
+    }
+
+    function parseLine(line) {
+      const delimiters = [
+        /_/,
+        /｜/,
+        /\|/,
+        /\t+/,
+        /\s*\/\s*/,
+        /\u3000+/,
+        / {2,}/,
+        /\s*-\s*/
+      ];
+
+      for (const delimiter of delimiters) {
+        const parts = line.split(delimiter).map((part) => part.trim()).filter(Boolean);
+        if (parts.length >= 3) {
+          return {
+            hanzi: parts[0],
+            pinyin: parts[1],
+            meaning: parts.slice(2).join(" ")
+          };
+        }
+      }
+
+      return null;
+    }
+
+    function renderQuestion() {
+      const item = quizItems[currentIndex];
+      if (!item) {
+        resetView("使える問題がありません");
+        return;
+      }
+
+      answerVisible = false;
+      counter.textContent = `${currentIndex + 1} / ${quizItems.length}`;
+      question.innerHTML = '<div class="mark">?</div>';
+      setNextButtonLabel(currentIndex === quizItems.length - 1 ? "終了" : "次へ");
+      setButtons(true);
+    }
+
+    function resetView(text) {
+      counter.textContent = "0 / 0";
+      question.innerHTML = `<p class="hint">${escapeHtml(text)}</p>`;
+      setButtons(false);
+    }
+
+    function setButtons(enabled) {
+      speakButton.disabled = !enabled || !("speechSynthesis" in window);
+      answerButton.disabled = !enabled;
+      nextButton.disabled = !enabled;
+      shuffleButton.disabled = !enabled;
+      restartButton.disabled = !enabled;
+    }
+
+    function speakCurrentWord() {
+      const item = quizItems[currentIndex];
+      if (!item) return;
+      speakChinese(item.hanzi);
+    }
+
+    function speakChinese(text) {
+      if (!("speechSynthesis" in window)) {
+        setMessage("このブラウザは読み上げに対応していません。", true);
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "zh-CN";
+      utterance.rate = 1;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function showAnswer() {
+      const item = quizItems[currentIndex];
+      if (!item) return;
+
+      answerVisible = true;
+      question.innerHTML = `
+        <div>
+          <p class="hanzi">${escapeHtml(item.hanzi)}</p>
+          <p class="pinyin">${escapeHtml(item.pinyin)}</p>
+          <p class="meaning">${escapeHtml(item.meaning)}</p>
+        </div>
+      `;
+    }
+
+    function nextQuestion() {
+      if (currentIndex === -1) {
+        restartQuiz();
+        return;
+      }
+
+      if (currentIndex >= quizItems.length - 1) {
+        currentIndex = -1;
+        counter.textContent = `${quizItems.length} / ${quizItems.length}`;
+        question.innerHTML = '<p class="hanzi">終了</p>';
+        speakButton.disabled = true;
+        answerButton.disabled = true;
+        nextButton.disabled = false;
+        setNextButtonLabel("もう一周");
+        return;
+      }
+
+      currentIndex += 1;
+      renderQuestion();
+    }
+
+    function restartQuiz() {
+      if (quizItems.length === 0) return;
+      currentIndex = 0;
+      renderQuestion();
+    }
+
+    function shuffleQuiz() {
+      for (let i = quizItems.length - 1; i > 0; i -= 1) {
+        const randomIndex = Math.floor(Math.random() * (i + 1));
+        [quizItems[i], quizItems[randomIndex]] = [quizItems[randomIndex], quizItems[i]];
+      }
+      restartQuiz();
+      setMessage("シャッフルしました。", false);
+    }
+
+    function clearText() {
+      problemText.value = "";
+      problemText.focus();
+      resetView("問題テキストを入力してください");
+      setMessage("入力欄を空にしました。", false);
+    }
+
+    function handleKeys(event) {
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag === "TEXTAREA" || tag === "INPUT") return;
+
+      if (event.code === "Space") {
+        event.preventDefault();
+        if (!speakButton.disabled) speakCurrentWord();
+      }
+
+      if (event.code === "Enter") {
+        event.preventDefault();
+        if (!answerButton.disabled && !answerVisible) showAnswer();
+      }
+
+      if (event.code === "ArrowRight") {
+        event.preventDefault();
+        if (!nextButton.disabled) nextQuestion();
+      }
+    }
+
+    function setMessage(text, isError) {
+      message.textContent = text;
+      message.className = isError ? "message" : "message info";
+    }
+
+    function setNextButtonLabel(label) {
+      nextButton.setAttribute("aria-label", label);
+      nextButton.setAttribute("title", label);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+  </script>
+</body>
+</html>
